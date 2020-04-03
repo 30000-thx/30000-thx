@@ -1,0 +1,91 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>黑警死全家 死完爸爸死媽媽</title>
+    <link rel="stylesheet" type="text/css" href="/css/semantic.min.css">
+    <script
+    src="https://code.jquery.com/jquery-3.1.1.min.js"
+    integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+    crossorigin="anonymous"></script>
+    <script src="/js/semantic.min.js"></script>
+</head>
+<body>
+    <div class="ui active progress yellow"  id="popo_bar" data-value="100" data-total="200" >
+        <div class="bar">
+            <div class="progress"></div>
+        </div>
+        <div class="label">4/30000</div>
+    </div>
+    <div class="ui cards" id="popoDieFullHouse">
+
+    </div>
+    <script type="text/javascript">
+        var popo;
+        var fullHouse = document.getElementById("popoDieFullHouse");
+
+        (function() {
+            popo = JSON.parse(httpGet("/data/popo.json"));
+            
+            $('#popo_bar').progress({
+                percent: popo.data.length * 100 / 30000,
+            });
+
+            document.getElementById("popo_bar").getElementsByClassName("label")[0].innerText = `${popo.data.length} / 30000`;
+
+            for ( var i in popo.data ) {
+                var p = popo.data[i]
+
+                var card = document.createElement("div");
+                card.className = "card";
+
+                var content = document.createElement("div");
+                content.className = "content";
+
+                var header = document.createElement("div");
+                header.className = "header";
+                header.append(document.createTextNode(`${p.district} ${p.age}歲${p.gender}popo`));
+
+                var meta = document.createElement("div");
+                meta.className = "meta";
+                meta.append(document.createTextNode(`${p.unit}`));
+
+                var description = document.createElement("div");
+                description.className = "description";
+
+                for ( var r in p.reference ) {
+                    var ref = p.reference[r];
+                    var para = document.createElement("p")
+                    var link = document.createElement("a");
+                    link.href = ref;
+                    link.target = "_blank";
+                    link.append(document.createTextNode(truncateLink(ref)));
+                    para.append(link)
+                    description.appendChild(para);
+                }
+
+                content.appendChild(header);
+                content.appendChild(meta);
+                content.appendChild(description);
+
+                card.appendChild(content);
+
+                fullHouse.appendChild(card);
+            }
+        })();
+
+        function httpGet(theUrl)
+        {
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.open( "GET", theUrl, false ); // false for synchronous request
+            xmlHttp.send( null );
+            return xmlHttp.responseText;
+        }
+        function truncateLink(oldText) {
+            if (oldText.length > 30) {
+                return oldText.substring(0, 30) + '...';
+            }
+            return oldText;
+        }
+    </script>
+</body>
+</html>
